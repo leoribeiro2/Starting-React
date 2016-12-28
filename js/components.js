@@ -76,6 +76,38 @@ let Button = React.createClass({
 let Form = React.createClass({
     displayName: "Form",
 
+    getInitialState: function () {
+        return { name: '', email: '', subject: 'r', messenger: '' };
+    },
+    handleNameChange: function (e) {
+        this.setState({ name: e.target.value });
+    },
+    handleEmailChange: function (e) {
+        this.setState({ email: e.target.value });
+    },
+    handleSubjectChange: function (e) {
+        this.setState({ subject: e.target.value });
+    },
+    handleMessegerChange: function (e) {
+        this.setState({ messenger: e.target.value });
+    },
+    handleSubmit: function (e) {
+        e.preventDefault();
+        let name = this.state.name.trim();
+        let email = this.state.email.trim();
+        let subject = this.state.subject.trim();
+        let messenger = this.state.messenger.trim();
+        if (!name || !email || !subject || !messenger) {
+            return;
+        }
+        this.props.onContactSubmit({
+            id: this.props.idNumber,
+            name: name,
+            email: email,
+            subject: subject,
+            messenger: messenger
+        });
+    },
     render: function () {
         let inputStyle = {
             padding: "20px",
@@ -84,7 +116,7 @@ let Form = React.createClass({
         };
         return React.createElement(
             "form",
-            null,
+            { onSubmit: this.handleSubmit },
             React.createElement(
                 "div",
                 { className: "form-group" },
@@ -93,7 +125,7 @@ let Form = React.createClass({
                     { htmlFor: "name" },
                     "Name"
                 ),
-                React.createElement("input", { style: inputStyle, className: "form-control", id: "name", placeholder: "name", type: "text" })
+                React.createElement("input", { style: inputStyle, className: "form-control", onChange: this.handleNameChange, placeholder: "name", type: "text" })
             ),
             React.createElement(
                 "div",
@@ -103,7 +135,7 @@ let Form = React.createClass({
                     { htmlFor: "email" },
                     "Email"
                 ),
-                React.createElement("input", { style: inputStyle, className: "form-control", id: "email", placeholder: "email", type: "email" })
+                React.createElement("input", { style: inputStyle, className: "form-control", onChange: this.handleEmailChange, placeholder: "email", type: "email" })
             ),
             React.createElement(
                 "div",
@@ -115,7 +147,7 @@ let Form = React.createClass({
                 ),
                 React.createElement(
                     "select",
-                    { defaultValue: "r", className: "form-control", name: "subject", id: "subject" },
+                    { defaultValue: this.state.subject, className: "form-control", name: "subject", onChange: this.handleSubjectChange },
                     React.createElement(
                         "option",
                         { value: "a" },
@@ -138,10 +170,111 @@ let Form = React.createClass({
                 { className: "form-group" },
                 React.createElement(
                     "label",
-                    { htmlFor: "message" },
-                    "Message"
+                    { htmlFor: "messenger" },
+                    "Messenger"
                 ),
-                React.createElement("textarea", { style: inputStyle, rows: "3", className: "form-control", id: "message", placeholder: "message" })
+                React.createElement("textarea", { style: inputStyle, rows: "3", className: "form-control", id: "messenger", placeholder: "messenger", onChange: this.handleMessegerChange })
+            ),
+            React.createElement(
+                "div",
+                { className: "row" },
+                React.createElement(
+                    Button,
+                    { textActive: "Loading..." },
+                    "Send"
+                )
+            )
+        );
+    }
+});
+
+let Contact = React.createClass({
+    displayName: "Contact",
+
+    render: function () {
+        return React.createElement(
+            "tr",
+            null,
+            React.createElement(
+                "th",
+                { scope: "row" },
+                this.props.idNumber
+            ),
+            React.createElement(
+                "td",
+                null,
+                this.props.name
+            ),
+            React.createElement(
+                "td",
+                null,
+                this.props.email
+            ),
+            React.createElement(
+                "td",
+                null,
+                this.props.subject
+            ),
+            React.createElement(
+                "td",
+                null,
+                this.props.children
+            )
+        );
+    }
+});
+
+let List = React.createClass({
+    displayName: "List",
+
+    render: function () {
+        let contactNodes = this.props.data.map(function (contact) {
+            return React.createElement(
+                Contact,
+                { idNumber: contact.id, name: contact.name, email: contact.email, subject: contact.subject },
+                contact.messenger
+            );
+        });
+        return React.createElement(
+            "table",
+            { className: "table" },
+            React.createElement(
+                "thead",
+                null,
+                React.createElement(
+                    "tr",
+                    null,
+                    React.createElement(
+                        "th",
+                        null,
+                        "ID"
+                    ),
+                    React.createElement(
+                        "th",
+                        null,
+                        "Name"
+                    ),
+                    React.createElement(
+                        "th",
+                        null,
+                        "Email"
+                    ),
+                    React.createElement(
+                        "th",
+                        null,
+                        "Subject"
+                    ),
+                    React.createElement(
+                        "th",
+                        null,
+                        "Messenger"
+                    )
+                )
+            ),
+            React.createElement(
+                "tbody",
+                null,
+                contactNodes
             )
         );
     }

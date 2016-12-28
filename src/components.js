@@ -58,6 +58,38 @@ let Button = React.createClass({
 });
 
 let Form = React.createClass ({
+    getInitialState: function () {
+        return {name: '', email:'', subject:'r', messenger:''}
+    },
+    handleNameChange: function (e) {
+        this.setState({name: e.target.value});
+    },
+    handleEmailChange: function (e) {
+        this.setState({email: e.target.value});
+    },
+    handleSubjectChange: function (e) {
+        this.setState({subject: e.target.value});
+    },
+    handleMessegerChange: function (e) {
+        this.setState({messenger: e.target.value});
+    },
+    handleSubmit: function (e) {
+        e.preventDefault();
+        let name = this.state.name.trim();
+        let email = this.state.email.trim();
+        let subject =  this.state.subject.trim();
+        let messenger = this.state.messenger.trim();
+        if(!name || !email || !subject || !messenger){
+            return;
+        }
+        this.props.onContactSubmit({
+            id: this.props.idNumber,
+            name: name,
+            email: email,
+            subject: subject,
+            messenger: messenger
+        })
+    },
     render: function () {
         let inputStyle = {
             padding: "20px",
@@ -65,28 +97,69 @@ let Form = React.createClass ({
             color: "#A7A5A5"
         };
         return (
-            <form>
+            <form onSubmit={this.handleSubmit}>
                 <div className="form-group">
                     <label htmlFor="name">Name</label>
-                    <input style={inputStyle} className="form-control" id="name" placeholder="name" type="text"/>
+                    <input style={inputStyle} className="form-control" onChange={this.handleNameChange} placeholder="name" type="text"/>
                 </div>
                 <div className="form-group">
                     <label htmlFor="email">Email</label>
-                    <input style={inputStyle} className="form-control" id="email" placeholder="email" type="email"/>
+                    <input style={inputStyle} className="form-control" onChange={this.handleEmailChange} placeholder="email" type="email"/>
                 </div>
                 <div className="form-group">
                     <label htmlFor="subject">Subject</label>
-                    <select defaultValue="r" className="form-control" name="subject" id="subject">
+                    <select defaultValue={this.state.subject} className="form-control" name="subject" onChange={this.handleSubjectChange}>
                         <option value="a">Angular JS</option>
                         <option value="j">Jquery</option>
                         <option value="r">React</option>
                     </select>
                 </div>
                 <div className="form-group">
-                    <label htmlFor="message">Message</label>
-                    <textarea style={inputStyle} rows="3" className="form-control" id="message" placeholder="message"/>
+                    <label htmlFor="messenger">Messenger</label>
+                    <textarea style={inputStyle} rows="3" className="form-control" id="messenger" placeholder="messenger" onChange={this.handleMessegerChange}/>
                 </div>
+                <div className="row"><Button textActive="Loading...">Send</Button></div>
             </form>
+        );
+    }
+});
+
+let Contact = React.createClass ({
+    render: function () {
+        return (
+            <tr>
+                <th scope="row">{this.props.idNumber}</th>
+                <td>{this.props.name}</td>
+                <td>{this.props.email}</td>
+                <td>{this.props.subject}</td>
+                <td>{this.props.children}</td>
+            </tr>
+        )
+    }
+});
+
+let List = React.createClass ({
+    render : function () {
+        let contactNodes = this.props.data.map(function (contact) {
+            return (<Contact idNumber={contact.id} name={contact.name} email={contact.email} subject={contact.subject} >
+                {contact.messenger}
+            </Contact>)
+        });
+        return (
+            <table className="table">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Subject</th>
+                    <th>Messenger</th>
+                </tr>
+                </thead>
+                <tbody>
+                {contactNodes}
+                </tbody>
+            </table>
         );
     }
 });
